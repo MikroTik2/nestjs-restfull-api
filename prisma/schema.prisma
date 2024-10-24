@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+  MODERATOR
+}
+
+type Avatar {
+  url         String
+  public_id   String
+}            
+
+model User {
+  id                      String        @id @default(auto()) @map("_id") @db.ObjectId
+  firstname               String?
+  lastname                String?
+  username                String        @unique
+  mobile                  String?
+  email                   String        @unique
+  password                String
+  provider                String?
+  google_id               String?
+  github_id               String?
+  blocked                 Boolean       @default(false)
+  avatar                  Avatar?
+  role                    Role          @default(USER)
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
+  reset_password_token    String?
+  reset_password_expire   DateTime?    
+  comments Comment[]
+  posts Post[]
+}
+
+model Post {
+  id           String                  @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  content      String
+  author       User                    @relation(fields: [authorId], references: [id])
+  authorId     String                  @db.ObjectId 
+  published    Boolean                 @default(false)
+  images       String[]
+  likes        String[]
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+  Comment      Comment[]
+  categories   CategoriesOnPosts[]
+}
+
+model Category {
+  id           String                 @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  slug         String                 @unique
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+  Post         CategoriesOnPosts[]
+}
+
+model CategoriesOnPosts {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  post        Post        @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  postId     String       @db.ObjectId 
+  category    Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  categoryId  String      @db.ObjectId 
+  assignedAt  DateTime    @default(now())
+}
+
+model Comment {
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  text         String
+  author       User         @relation(fields: [authorId], references: [id])
+  authorId     String       @db.ObjectId 
+  post         Post         @relation(fields: [postId], references: [id])
+  postId       String       @db.ObjectId 
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  replyId      String?      @db.ObjectId 
+  reply        Comment?     @relation("replies", fields: [replyId], references: [id], onDelete: NoAction, onUpdate: NoAction) 
+  childs       Comment[]    @relation("replies") 
+}
