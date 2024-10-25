@@ -101,7 +101,10 @@ export class UsersController {
      @ApiResponse({ status: 200, description: 'User successfully updated.' })
      @ApiResponse({ status: 404, description: 'User not found.' })
      @ApiParam({ name: 'id', required: true, description: 'User ID' })
-     async update(@Req() req: IAuthenticationRequest, @Body() data: UserUpdateInput): Promise<User> {
+     async update(
+          @Req() req: IAuthenticationRequest,
+          @Body() data: UserUpdateInput,
+     ): Promise<User> {
           return this.usersService.update(req.user.sub, data);
      }
 

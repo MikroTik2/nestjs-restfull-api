@@ -5,6 +5,7 @@ import { Module } from '@nestjs/common';
 import { UsersModule } from '@/modules/users/users.module';
 import { PrismaModule } from '@/modules/prisma/prisma.module';
 import { AuthenticationModule } from '@/modules/authentication/authentication.module';
+import { CategoriesModule } from '@/modules/categories/categories.module';
 
 import configs from '@/shared/config/index';
 
@@ -24,6 +25,7 @@ import configs from '@/shared/config/index';
 
           PrismaModule,
           UsersModule,
+          CategoriesModule,
           AuthenticationModule,
      ],
 })

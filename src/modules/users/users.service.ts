@@ -68,15 +68,16 @@ export class UsersService {
           await this.findById(id);
 
           if (data?.avatar?.url) {
-
-               const { url, public_id } = await this.cloudinaryService.uploadImage(data?.avatar?.url)
+               const { url, public_id } = await this.cloudinaryService.uploadImage(
+                    data?.avatar?.url,
+               );
 
                await this.update(id, {
                     avatar: {
                          public_id,
                          url,
                     },
-               })
+               });
 
                return;
           }
