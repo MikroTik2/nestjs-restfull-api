@@ -14,7 +14,7 @@ export class CategoriesService {
      constructor(private readonly categoriesRepository: CategoriesRepository) {}
 
      async create(createDto: CreateCategoryDto): Promise<Category> {
-          let input: CategoryCreateInput = {
+          const input: CategoryCreateInput = {
                name: createDto.name,
                slug: slugify(createDto.name, {
                     lower: true,

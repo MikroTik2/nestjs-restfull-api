@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, UseInterceptors } from '@nestjs/common';
+import {
+     Body,
+     Controller,
+     Delete,
+     Get,
+     Param,
+     Patch,
+     Post,
+     Put,
+     UseInterceptors,
+} from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { ResponseInterceptor } from '@/shared/interceptors/response.interceptor';
@@ -38,7 +48,7 @@ export class CategoriesController {
      }
 
      @Get('s/:slug')
-     @ApiParam({ name:'slug', required: true, description: 'Category slug' })
+     @ApiParam({ name: 'slug', required: true, description: 'Category slug' })
      @ApiOperation({ summary: 'Get a category by slug' })
      @ApiResponse({ status: 200, description: 'Category found.' })
      @ApiResponse({ status: 404, description: 'Category not found.' })

@@ -13,7 +13,7 @@ enum Role {
   MODERATOR
 }
 
-type Avatar {
+type Image {
   url         String
   public_id   String
 }            
@@ -30,14 +30,14 @@ model User {
   google_id               String?
   github_id               String?
   blocked                 Boolean       @default(false)
-  avatar                  Avatar?
+  avatar                  Image?
   role                    Role          @default(USER)
   createdAt               DateTime      @default(now())
   updatedAt               DateTime      @updatedAt
   reset_password_token    String?
   reset_password_expire   DateTime?    
-  comments Comment[]
-  posts Post[]
+  comments                Comment[]
+  posts                   Post[]
 }
 
 model Post {
@@ -47,11 +47,12 @@ model Post {
   author       User                    @relation(fields: [authorId], references: [id])
   authorId     String                  @db.ObjectId 
   published    Boolean                 @default(false)
-  images       String[]
+  images       Image[]
   likes        String[]
   createdAt    DateTime                @default(now())
   updatedAt    DateTime                @updatedAt
-  Comment      Comment[]
+  tags         String                  @default("[]")
+  comment      Comment[]
   categories   CategoriesOnPosts[]
 }
 

@@ -23,8 +23,8 @@ async function bootstrap() {
      app.use(helmet());
      app.enableCors({
           origin: '*',
-          methods: ['GET', 'POST', 'PUT', 'DELETE'],
           credentials: true,
+          methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
      });
 
      const config: ConfigService<IAppConfiguration> = new ConfigService();
@@ -33,19 +33,19 @@ async function bootstrap() {
      const isDevelopmentMode: boolean =
           config.get<string>('NODE_ENV').toUpperCase() === 'DEVELOPMENT';
 
-     const DOCUMENT_ROUTE: string = '/api';
+     const DOCUMENT_ROUTE = '/api';
 
      if (isDevelopmentMode) document(app, DOCUMENT_ROUTE);
 
      await app.listen(port);
 
-     logger.log(`Server running on http://localhost:${port}`);
+     logger.debug(`Server running on http://localhost:${port}`);
 
      const appUrl: string = isDevelopmentMode ? `http://localhost:${port}` : await app.getUrl();
 
-     logger.log(`GraphQl: ${appUrl}/graphql`);
+     logger.debug(`GraphQl: ${appUrl}/graphql`);
 
-     isDevelopmentMode && logger.log(`RestApi: http://localhost:${port}${DOCUMENT_ROUTE}`);
+     isDevelopmentMode && logger.debug(`RestApi: http://localhost:${port}${DOCUMENT_ROUTE}`);
 }
 
 bootstrap();
