@@ -1,56 +1,73 @@
 import { ResponseInterceptor } from '@/shared/interceptors/response.interceptor';
-import { Post, UseInterceptors, Controller, Body, UseGuards, Req, Get, Query, Delete, Put, Param } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+     Post,
+     UseInterceptors,
+     Controller,
+     Body,
+     UseGuards,
+     Get,
+     Query,
+     Delete,
+     Put,
+     Param,
+} from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreatePostDto } from '@/modules/posts/dtos/create.dto';
 import { PostsService } from '@/modules/posts/posts.service';
-import { IJwtPayload } from '@/shared/interfaces/jwt-payload.interface';
 import { JwtAuthGuard } from '@/shared/guards/jwt-auth.guard';
 
 import { SearchPostDto } from '@/modules/posts/dtos/search.dto';
 import { UpdatePostDto } from '@/modules/posts/dtos/update.dto';
-
-interface IAuthenticationRequest extends Request {
-     user: IJwtPayload;
-}
+import { getUser } from '@/shared/decorators/req-user.decorator';
+import { User } from '@prisma/client';
 
 @ApiTags('Posts')
 @Controller('posts')
 @UseInterceptors(ResponseInterceptor)
 export class PostsController {
-     constructor(
-          private readonly postsService: PostsService,
-     ) {};
+     constructor(private readonly postsService: PostsService) {}
 
      @Post('new')
      @UseGuards(JwtAuthGuard)
-     createPost(@Req() req: IAuthenticationRequest, @Body() createPostDto: CreatePostDto) {
-          return this.postsService.create(req.user.sub, createPostDto);
-     };
+     @ApiOperation({ summary: 'create a new post' })
+     createPost(@getUser() user: User, @Body() createPostDto: CreatePostDto) {
+          return this.postsService.create(user.id, createPostDto);
+     }
 
-     @ApiOperation({ summary: "get public Posts",})
-     @ApiQuery({ name: "title", required: false })
-     @ApiQuery({ name: "content", required: false })
-     @ApiQuery({ name: "page", required: false })
-     @ApiQuery({ name: "limit", required: false })
      @Get('all')
+     @ApiOperation({ summary: 'get public Posts' })
      async getPublicPosts(@Query() query: SearchPostDto) {
           return this.postsService.getPublicPosts(query);
      }
 
      @Get('single/:id')
+     @ApiOperation({ summary: 'get a single post' })
      async getSinglePost(@Param('id') id: string) {
           return this.postsService.singlePost(id);
-     };
+     }
 
      @Put('edit/:id')
      @UseGuards(JwtAuthGuard)
-     async updatePost(@Param('id') id: string, @Req() req: IAuthenticationRequest, @Body() updatePostData: UpdatePostDto) {
-          return this.postsService.update(req.user.sub, id, updatePostData);
-     };
+     @ApiOperation({ summary: 'update a post' })
+     async updatePost(
+          @Param('id') id: string,
+          @getUser() user: User,
+          @Body() updatePostData: UpdatePostDto,
+     ) {
+          return this.postsService.update(user.id, id, updatePostData);
+     }
+
+     @Put('likes/:id')
+     @UseGuards(JwtAuthGuard)
+     @ApiOperation({ summary: 'like a post' })
+     async likePost(@Param('id') id: string, @getUser() user: User) {
+          return this.postsService.likes(user.id, id);
+     }
 
      @Delete('delete/:id')
      @UseGuards(JwtAuthGuard)
-     async deletePost(@Param('id') id: string, @Req() req: IAuthenticationRequest) {
-          return this.postsService.delete(req.user.sub, id);
-     };
-};
+     @ApiOperation({ summary: 'delete a post' })
+     async deletePost(@Param('id') id: string, @getUser() user: User) {
+          return this.postsService.delete(user.id, id);
+     }
+}

@@ -38,14 +38,9 @@ export class AuthenticationService {
 
      async signup(userDto: SignUpDto): Promise<_User> {
           try {
-               const userExists = await this.usersService.findOneByEmailAndUsername(
-                    userDto.email,
-                    userDto.username,
-               );
+               const userExists = await this.usersService.findByEmail(userDto.email);
 
-               if (userExists) {
-                    throw new BadRequestException('User already exists');
-               }
+               if (userExists) throw new BadRequestException('Email already exists');
 
                const user = await this.usersService.create({
                     ...userDto,

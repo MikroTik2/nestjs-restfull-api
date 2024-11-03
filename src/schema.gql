@@ -1,0 +1,41 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type ImageModel {
+  public_id: String!
+  url: String!
+}
+
+"""Post model"""
+type PostModel {
+  author: authorModel!
+  authorId: String!
+  content: String!
+  createdAt: DateTime!
+  id: ID!
+  images: [ImageModel!]
+  likes: String!
+  published: Boolean!
+  tags: String!
+  title: String!
+  updatedAt: DateTime!
+}
+
+type Query {
+  all(content: String, limit: Float!, page: Float!, title: String): [PostModel!]!
+  findById(postId: String!): PostModel!
+}
+
+"""User model"""
+type authorModel {
+  createdAt: DateTime!
+  id: String!
+  updatedAt: DateTime!
+  username: String!
+}

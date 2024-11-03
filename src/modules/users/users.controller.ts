@@ -10,19 +10,16 @@ import {
      Query,
      Req,
      UseGuards,
+     ValidationPipe,
+     UsePipes,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { User, UserCreateInput, UserUpdateInput } from '@/shared/interfaces/user.interface';
 import { ResponseInterceptor } from '@/shared/interceptors/response.interceptor';
 import { UsersService } from '@/modules/users/users.service';
 import { FindUserDto } from '@/modules/users/dtos/find-user.dto';
-import { Request } from 'express';
-import { IJwtPayload } from '@/shared/interfaces/jwt-payload.interface';
 import { JwtAuthGuard } from '@/shared/guards/jwt-auth.guard';
-
-interface IAuthenticationRequest extends Request {
-     user: IJwtPayload;
-}
+import { getUser } from '@/shared/decorators/req-user.decorator';
 
 @ApiTags('Users')
 @Controller('users')
@@ -31,29 +28,20 @@ export class UsersController {
      constructor(private readonly usersService: UsersService) {}
 
      @Post('new')
-     @ApiOperation({ summary: 'Create a new user' })
-     @ApiResponse({ status: 201, description: 'User successfully created.' })
-     @ApiResponse({ status: 400, description: 'Invalid data.' })
+     @ApiOperation({ summary: 'create a new user' })
      async create(@Body() user: UserCreateInput): Promise<User> {
           return this.usersService.create(user);
      }
 
      @Get('all')
-     @ApiOperation({ summary: 'Retrieve a list of users' })
-     @ApiResponse({ status: 200, description: 'List of users.' })
-     @ApiResponse({ status: 404, description: 'Users not found.' })
-     @ApiQuery({ name: 'params', required: false, type: FindUserDto })
-     async find(
-          @Query('skip') skip: string,
-          @Query('take') take: string,
-          @Query('where') where: string,
-          @Query('orderBy') orderBy: string,
-     ): Promise<User[]> {
+     @ApiOperation({ summary: 'retrieve a list of users' })
+     @UsePipes(new ValidationPipe({ transform: true }))
+     async find(@Query() query: FindUserDto): Promise<User[]> {
           const params = {
-               skip: skip ? parseInt(skip, 10) : undefined,
-               take: take ? parseInt(take, 10) : undefined,
-               where: where ? JSON.parse(where) : undefined,
-               orderBy: orderBy ? JSON.parse(orderBy) : undefined,
+               skip: query.skip,
+               take: query.take,
+               where: query.where,
+               orderBy: query.orderBy,
           };
 
           return this.usersService.find(params);
@@ -61,58 +49,41 @@ export class UsersController {
 
      @Get('/profile')
      @UseGuards(JwtAuthGuard)
-     @ApiOperation({ summary: 'Retrieve the current user profile' })
-     @ApiResponse({ status: 200, description: 'User profile.' })
-     @ApiResponse({ status: 401, description: 'Unauthorized.' })
-     async findOwnProfile(@Req() req: IAuthenticationRequest) {
-          return this.usersService.findById(req.user.sub);
+     @ApiOperation({ summary: 'retrieve the current user profile' })
+     async findOwnProfile(@getUser() user: User) {
+          return this.usersService.findById(user.id);
      }
 
      @Get('single/:id')
-     @ApiOperation({ summary: 'Retrieve a user by ID' })
-     @ApiResponse({ status: 200, description: 'User found.' })
-     @ApiResponse({ status: 404, description: 'User not found.' })
-     @ApiParam({ name: 'id', required: true, description: 'User ID' })
+     @ApiOperation({ summary: 'retrieve a user by ID' })
      async findById(@Param('id') id: string): Promise<User> {
           return this.usersService.findById(id);
      }
 
      @Get('single/email/:email')
-     @ApiOperation({ summary: 'Retrieve a user by email' })
-     @ApiResponse({ status: 200, description: 'User found.' })
-     @ApiResponse({ status: 404, description: 'User not found.' })
-     @ApiParam({ name: 'email', required: true, description: 'User email' })
+     @ApiOperation({ summary: 'retrieve a user by email' })
      async findByEmail(@Param('email') email: string): Promise<User> {
           return this.usersService.findByEmail(email);
      }
 
      @Get('single/username/:username')
-     @ApiOperation({ summary: 'Retrieve a user by username' })
-     @ApiResponse({ status: 200, description: 'User found.' })
-     @ApiResponse({ status: 404, description: 'User not found.' })
-     @ApiParam({ name: 'username', required: true, description: 'Username' })
+     @ApiOperation({ summary: 'retrieve a user by username' })
      async findByUsername(@Param('username') username: string): Promise<User> {
           return this.usersService.findByUsername(username);
      }
 
      @Put('profile/edit')
      @UseGuards(JwtAuthGuard)
-     @ApiOperation({ summary: 'Update user information' })
-     @ApiResponse({ status: 200, description: 'User successfully updated.' })
-     @ApiResponse({ status: 404, description: 'User not found.' })
-     @ApiParam({ name: 'id', required: true, description: 'User ID' })
+     @ApiOperation({ summary: 'update user information' })
      async update(
-          @Req() req: IAuthenticationRequest,
+          @getUser() user: User,
           @Body() data: UserUpdateInput,
      ): Promise<User> {
-          return this.usersService.update(req.user.sub, data);
+          return this.usersService.update(user.id, data);
      }
 
      @Put('role/:id')
-     @ApiOperation({ summary: 'Update user role' })
-     @ApiResponse({ status: 200, description: 'User role successfully updated.' })
-     @ApiResponse({ status: 404, description: 'User not found.' })
-     @ApiParam({ name: 'id', required: true, description: 'User ID' })
+     @ApiOperation({ summary: 'update user role' })
      async updateByRole(
           @Param('id') id: string,
           @Body('role') role: 'ADMIN' | 'USER' | 'MODERATOR',
@@ -121,28 +92,19 @@ export class UsersController {
      }
 
      @Put('block/:id')
-     @ApiOperation({ summary: 'Block a user' })
-     @ApiResponse({ status: 200, description: 'User successfully blocked.' })
-     @ApiResponse({ status: 404, description: 'User not found.' })
-     @ApiParam({ name: 'id', required: true, description: 'User ID' })
+     @ApiOperation({ summary: 'block a user' })
      async block(@Param('id') id: string): Promise<User> {
           return this.usersService.block(id);
      }
 
      @Put('unblock/:id')
-     @ApiOperation({ summary: 'Unblock a user' })
-     @ApiResponse({ status: 200, description: 'User successfully unblocked.' })
-     @ApiResponse({ status: 404, description: 'User not found.' })
-     @ApiParam({ name: 'id', required: true, description: 'User ID' })
+     @ApiOperation({ summary: 'unblock a user' })
      async unBlock(@Param('id') id: string): Promise<User> {
           return this.usersService.unBlock(id);
      }
 
      @Delete('remove/:id')
-     @ApiOperation({ summary: 'Delete a user' })
-     @ApiResponse({ status: 200, description: 'User successfully deleted.' })
-     @ApiResponse({ status: 404, description: 'User not found.' })
-     @ApiParam({ name: 'id', required: true, description: 'User ID' })
+     @ApiOperation({ summary: 'delete a user' })
      async delete(@Param('id') id: string): Promise<User> {
           return this.usersService.delete(id);
      }

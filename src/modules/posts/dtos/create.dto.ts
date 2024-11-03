@@ -6,21 +6,18 @@ import {
      IsArray,
      IsBoolean,
      IsNotEmpty,
-     IsNumber,
      IsOptional,
      IsString,
-     Max,
-     Min,
      ValidateNested,
 } from 'class-validator';
 
 export class Image {
      @ApiProperty({ example: 'sample', description: 'Public ID of the image' })
      public_id: string;
- 
+
      @ApiProperty({ example: 'https://cloudinary.com/sample.png', description: 'URL of the image' })
      url: string;
- }
+}
 
 export class CreatePostDto {
      @IsString()

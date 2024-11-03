@@ -32,7 +32,7 @@ export class AuthenticationController {
      @Get('github')
      @UseGuards(GithubOauthGuard)
      @UseInterceptors(TokenInterceptor)
-     @ApiOperation({ summary: 'Redirect to Github OAuth' })
+     @ApiOperation({ summary: 'redirect to Github OAuth' })
      @ApiResponse({ status: HttpStatus.FOUND, description: 'Redirecting to Github OAuth.' })
      async githubAuth() {}
 
@@ -46,7 +46,7 @@ export class AuthenticationController {
      @Get('google')
      @UseGuards(GoogleOauthGuard)
      @UseInterceptors(TokenInterceptor)
-     @ApiOperation({ summary: 'Redirect to Google OAuth' })
+     @ApiOperation({ summary: 'redirect to Google OAuth' })
      @ApiResponse({ status: HttpStatus.FOUND, description: 'Redirecting to Google OAuth.' })
      async googleAuth() {}
 
@@ -60,7 +60,7 @@ export class AuthenticationController {
      @Post('signup')
      @HttpCode(HttpStatus.CREATED)
      @UseInterceptors(TokenInterceptor)
-     @ApiOperation({ summary: 'SignUp a new user' })
+     @ApiOperation({ summary: 'signup a new user' })
      @ApiResponse({
           status: HttpStatus.CREATED,
           description: 'The user has been successfully created.',
@@ -73,7 +73,7 @@ export class AuthenticationController {
      @Post('signin')
      @HttpCode(HttpStatus.OK)
      @UseInterceptors(TokenInterceptor)
-     @ApiOperation({ summary: 'SignIn a user' })
+     @ApiOperation({ summary: 'signin a user' })
      @ApiResponse({
           status: HttpStatus.OK,
           description: 'The user has been successfully logged in.',
@@ -85,7 +85,7 @@ export class AuthenticationController {
 
      @Post('logout')
      @HttpCode(HttpStatus.OK)
-     @ApiOperation({ summary: 'Logout a user' })
+     @ApiOperation({ summary: 'logout a user' })
      @ApiResponse({
           status: HttpStatus.OK,
           description: 'The user has been successfully logged out.',
@@ -98,7 +98,7 @@ export class AuthenticationController {
 
      @Post('forgot-password')
      @HttpCode(HttpStatus.OK)
-     @ApiOperation({ summary: 'Forgot password' })
+     @ApiOperation({ summary: 'forgot password' })
      @ApiResponse({
           status: HttpStatus.OK,
           description: 'The user has been successfully logged out.',
@@ -109,7 +109,7 @@ export class AuthenticationController {
 
      @Post('reset-password')
      @HttpCode(HttpStatus.OK)
-     @ApiOperation({ summary: 'Reset password' })
+     @ApiOperation({ summary: 'reset password' })
      @ApiResponse({
           status: HttpStatus.OK,
           description: 'The user has been successfully logged out.',

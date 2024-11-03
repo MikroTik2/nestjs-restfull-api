@@ -4,7 +4,6 @@ import { UsersService } from '@/modules/users/users.service';
 import { UsersRepository } from '@/modules/users/users.repository';
 import { PrismaModule } from '@/modules/prisma/prisma.module';
 import { CloudinaryModule } from '../cloudinary/cloudinary.module';
-import { JwtAuthGuard } from '@/shared/guards/jwt-auth.guard';
 import { JwtService } from '@nestjs/jwt';
 
 @Module({

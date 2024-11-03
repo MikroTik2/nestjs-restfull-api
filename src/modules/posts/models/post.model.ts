@@ -4,17 +4,17 @@ import { Post } from '@/shared/interfaces/post.interface';
 
 @ObjectType()
 export class ImageModel {
-    @Field((type) => String)
-    public_id: string;
+     @Field((type) => String)
+     public_id: string;
 
-    @Field((type) => String)
-    url: string;
+     @Field((type) => String)
+     url: string;
 }
 
 @ObjectType({
      description: 'Post model',
 })
-export class postModel implements Post {
+export class PostModel implements Post {
      @Field((type) => ID)
      id: string;
 

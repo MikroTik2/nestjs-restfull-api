@@ -18,14 +18,15 @@ async function bootstrap() {
 
      app.useGlobalPipes(new ValidateInputPipe());
      app.setGlobalPrefix('api/v1');
-
-     app.use(cookie());
-     app.use(helmet());
      app.enableCors({
           origin: '*',
           credentials: true,
-          methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
+          allowedHeaders: ['Content-Type', 'Authorization'],
+          methods: ['GET', 'POST', 'PUT', 'DELETE'],
      });
+
+     app.use(cookie());
+     app.use(helmet());
 
      const config: ConfigService<IAppConfiguration> = new ConfigService();
      const port = config.get<number>('PORT') || 3050;
@@ -39,13 +40,13 @@ async function bootstrap() {
 
      await app.listen(port);
 
-     logger.debug(`Server running on http://localhost:${port}`);
+     logger.debug(`SERVER RUNNING ON: http://localhost:${port}`);
 
      const appUrl: string = isDevelopmentMode ? `http://localhost:${port}` : await app.getUrl();
 
-     logger.debug(`GraphQl: ${appUrl}/graphql`);
+     logger.debug(`GRAPHQL: ${appUrl}/graphql`);
 
-     isDevelopmentMode && logger.debug(`RestApi: http://localhost:${port}${DOCUMENT_ROUTE}`);
+     isDevelopmentMode && logger.debug(`REST API: http://localhost:${port}${DOCUMENT_ROUTE}`);
 }
 
 bootstrap();
